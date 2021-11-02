@@ -4,3 +4,6 @@
 [submodule "imgui"]
 	path = imgui
 	url = https://github.com/ocornut/imgui
+[submodule "Catch2"]
+	path = Catch2
+	url = https://github.com/catchorg/Catch2

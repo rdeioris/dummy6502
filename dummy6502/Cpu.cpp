@@ -782,7 +782,7 @@ void dummy6502::Cpu::JSR()
 	Push(pc >> 8);
 	Push(pc & 0xff);
 	pc = opcode_address;
-	ticks += 5;
+	ticks += 3;
 }
 
 void dummy6502::Cpu::JMP()

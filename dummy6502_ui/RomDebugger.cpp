@@ -12,6 +12,7 @@ void RomDebugger::Init(DummyMachine& machine, SDL_Window* window, SDL_Renderer* 
 		disassembly.push_back({ current_line, line });
 	}
 
+	file_dialog.SetTitle("Select ROM");
 }
 
 void RomDebugger::Tick(DummyMachine& machine)

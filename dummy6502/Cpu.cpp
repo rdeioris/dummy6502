@@ -106,38 +106,77 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 	OPCODE(0xA1, IndirectX, LDA);
 	OPCODE(0xB1, IndirectY, LDA);
 
-
-	OPCODE(0xEA, Implied, NOP);
-	
-
-	
-
-	OPCODE(0x40, Implied, RTI);
-	OPCODE(0x60, Implied, RTS);
-
-
-
-	OPCODE(0xA9, Immediate, LDA);
-
 	OPCODE(0xA2, Immediate, LDX);
+	OPCODE(0xA6, ZeroPage, LDX);
+	OPCODE(0xB6, ZeroPageY, LDX);
+	OPCODE(0xAE, AbsoluteValue, LDX);
+	OPCODE(0xBE, AbsoluteValueY, LDX);
 
 	OPCODE(0xA0, Immediate, LDY);
-
-	OPCODE(0x8D, AbsoluteAddress, STA);
-
-	OPCODE(0xE8, Implied, INX);
-
-
-
-	OPCODE(0xE9, Immediate, SBC);
-
-	OPCODE(0x8A, Implied, TXA);
+	OPCODE(0xA4, ZeroPage, LDY);
+	OPCODE(0xB4, ZeroPageX, LDY);
+	OPCODE(0xAC, AbsoluteValue, LDY);
+	OPCODE(0xBC, AbsoluteValueX, LDY);
 
 	OPCODE(0x4A, Accumulator, LSR);
 	OPCODE(0x46, ZeroPage, LSR);
 	OPCODE(0x56, ZeroPageX, LSR);
 	OPCODE(0x4E, AbsoluteValue, LSR);
 	OPCODE(0x5E, AbsoluteValueX, LSR);
+
+	OPCODE(0xEA, Implied, NOP);
+
+	OPCODE(0x09, Immediate, ORA);
+	OPCODE(0x05, ZeroPage, ORA);
+	OPCODE(0x15, ZeroPageX, ORA);
+	OPCODE(0x0D, AbsoluteValue, ORA);
+	OPCODE(0x1D, AbsoluteValueX, ORA);
+	OPCODE(0x19, AbsoluteValueY, ORA);
+	OPCODE(0x01, IndirectX, ORA);
+	OPCODE(0x11, IndirectY, ORA);
+
+	OPCODE(0xAA, Implied, TAX);
+	OPCODE(0x8A, Implied, TXA);
+	OPCODE(0xCA, Implied, DEX);
+	OPCODE(0xE8, Implied, INX);
+	OPCODE(0xA8, Implied, TAY);
+	OPCODE(0x98, Implied, TYA);
+	OPCODE(0x88, Implied, DEY);
+	OPCODE(0xC8, Implied, INY);
+
+	OPCODE(0x2A, Accumulator, ROL);
+	OPCODE(0x26, ZeroPage, ROL);
+	OPCODE(0x36, ZeroPageX, ROL);
+	OPCODE(0x2E, AbsoluteValue, ROL);
+	OPCODE(0x3E, AbsoluteValueX, ROL);
+
+	OPCODE(0x6A, Accumulator, ROR);
+	OPCODE(0x66, ZeroPage, ROR);
+	OPCODE(0x76, ZeroPageX, ROR);
+	OPCODE(0x6E, AbsoluteValue, ROR);
+	OPCODE(0x7E, AbsoluteValueX, ROR);
+
+	OPCODE(0x40, Implied, RTI);
+
+	OPCODE(0x60, Implied, RTS);
+
+	OPCODE(0xE9, Immediate, SBC);
+	OPCODE(0xE5, ZeroPage, SBC);
+	OPCODE(0xF5, ZeroPageX, SBC);
+	OPCODE(0xED, AbsoluteValue, SBC);
+	OPCODE(0xFD, AbsoluteValueX, SBC);
+	OPCODE(0xF9, AbsoluteValueY, SBC);
+	OPCODE(0xE1, IndirectX, SBC);
+	OPCODE(0xF1, IndirectY, SBC);
+
+	OPCODE(0x85, ZeroPage, STA);
+	OPCODE(0x95, ZeroPageX, STA);
+	OPCODE(0x8D, AbsoluteAddressPlusOne, STA);
+	OPCODE(0x9D, AbsoluteAddressXPlusOne, STA);
+	OPCODE(0x99, AbsoluteAddressYPlusOne, STA);
+	OPCODE(0x81, IndirectX, STA);
+	OPCODE(0x91, IndirectY, STA);
+
 }
 
 uint16_t dummy6502::Cpu::Implied()
@@ -163,6 +202,7 @@ uint16_t dummy6502::Cpu::Immediate()
 uint16_t dummy6502::Cpu::ZeroPage()
 {
 	opcode_address = Read8FromPc();
+	addressing_mode_disassembly = std::format("${:02X}", opcode_address);
 	ticks++;
 	opcode_value = memory_controller.Read8(opcode_address);
 	ticks++;
@@ -172,9 +212,22 @@ uint16_t dummy6502::Cpu::ZeroPage()
 uint16_t dummy6502::Cpu::ZeroPageX()
 {
 	uint8_t zero_page_address = Read8FromPc();
-	addressing_mode_disassembly = std::format("${:02X}", zero_page_address);
+	addressing_mode_disassembly = std::format("${:02X}, X", zero_page_address);
 	ticks++;
 	zero_page_address += x;
+	ticks++;
+	opcode_address = zero_page_address;
+	opcode_value = memory_controller.Read8(opcode_address);
+	ticks++;
+	return 1;
+}
+
+uint16_t dummy6502::Cpu::ZeroPageY()
+{
+	uint8_t zero_page_address = Read8FromPc();
+	addressing_mode_disassembly = std::format("${:02X}, Y", zero_page_address);
+	ticks++;
+	zero_page_address += y;
 	ticks++;
 	opcode_address = zero_page_address;
 	opcode_value = memory_controller.Read8(opcode_address);
@@ -239,12 +292,10 @@ uint16_t dummy6502::Cpu::Indirect()
 
 uint16_t dummy6502::Cpu::AbsoluteValue()
 {
-	opcode_address = Read16FromPc();
-	addressing_mode_disassembly = std::format("${:04X}", opcode_address);
-	ticks += 2;
+	uint16_t size = AbsoluteAddress();
 	opcode_value = memory_controller.Read8(opcode_address);
 	ticks++;
-	return 2;
+	return size;
 }
 
 uint16_t dummy6502::Cpu::AbsoluteValueX()
@@ -257,8 +308,14 @@ uint16_t dummy6502::Cpu::AbsoluteValueX()
 
 uint16_t dummy6502::Cpu::AbsoluteValueXAlwaysCross()
 {
-	ticks++;
-	return AbsoluteValueX();
+	uint64_t before_ticks = ticks;
+	uint16_t size = AbsoluteValueX();
+	uint64_t after_ticks = ticks;
+	if (after_ticks - before_ticks < 4)
+	{
+		ticks++;
+	}
+	return size;
 }
 
 uint16_t dummy6502::Cpu::AbsoluteAddressX()
@@ -303,6 +360,36 @@ uint16_t dummy6502::Cpu::AbsoluteAddress()
 	addressing_mode_disassembly = std::format("${:04X}", opcode_address);
 	ticks += 2;
 	return 2;
+}
+
+uint16_t dummy6502::Cpu::AbsoluteAddressPlusOne()
+{
+	ticks++;
+	return AbsoluteAddress();
+}
+
+uint16_t dummy6502::Cpu::AbsoluteAddressXPlusOne()
+{
+	uint64_t before_ticks = ticks;
+	uint16_t size = AbsoluteAddressX();
+	uint64_t after_ticks = ticks;
+	if (after_ticks - before_ticks < 3)
+	{
+		ticks++;
+	}
+	return size;
+}
+
+uint16_t dummy6502::Cpu::AbsoluteAddressYPlusOne()
+{
+	uint64_t before_ticks = ticks;
+	uint16_t size = AbsoluteAddressY();
+	uint64_t after_ticks = ticks;
+	if (after_ticks - before_ticks < 3)
+	{
+		ticks++;
+	}
+	return size;
 }
 
 uint16_t dummy6502::Cpu::BranchAddress()
@@ -448,6 +535,13 @@ void dummy6502::Cpu::AND()
 	SetNegative(a & 0x80);
 }
 
+void dummy6502::Cpu::ORA()
+{
+	a |= opcode_value;
+	SetZero(a == 0);
+	SetNegative(a & 0x80);
+}
+
 void dummy6502::Cpu::BIT()
 {
 	SetZero(opcode_value & a);
@@ -481,6 +575,55 @@ void dummy6502::Cpu::TXA()
 	a = x;
 	SetZero(a == 0);
 	SetNegative(a & 0x80);
+	ticks++;
+}
+
+void dummy6502::Cpu::TAX()
+{
+	x = a;
+	SetZero(a == 0);
+	SetNegative(a & 0x80);
+	ticks++;
+}
+
+void dummy6502::Cpu::TYA()
+{
+	a = y;
+	SetZero(a == 0);
+	SetNegative(a & 0x80);
+	ticks++;
+}
+
+void dummy6502::Cpu::TAY()
+{
+	y = a;
+	SetZero(a == 0);
+	SetNegative(a & 0x80);
+	ticks++;
+}
+
+void dummy6502::Cpu::DEY()
+{
+	y--;
+	SetZero(y == 0);
+	SetNegative(y & 0x80);
+	ticks++;
+}
+
+void dummy6502::Cpu::DEX()
+{
+	x--;
+	SetZero(x == 0);
+	SetNegative(x & 0x80);
+	ticks++;
+}
+
+void dummy6502::Cpu::INY()
+{
+	y++;
+	SetZero(y == 0);
+	SetNegative(y & 0x80);
+	ticks++;
 }
 
 void dummy6502::Cpu::SBC()
@@ -498,6 +641,26 @@ void dummy6502::Cpu::ASL()
 	uint8_t old_a = a;
 	a <<= 1;
 	SetCarry(old_a >> 7);
+	SetZero(a == 0);
+	SetNegative(a & 0x80);
+}
+
+void dummy6502::Cpu::ROL()
+{
+	uint8_t old_a = a;
+	a <<= 1;
+	a |= GetCarry() ? 1 : 0;
+	SetCarry(old_a >> 7);
+	SetZero(a == 0);
+	SetNegative(a & 0x80);
+}
+
+void dummy6502::Cpu::ROR()
+{
+	uint8_t old_a = a;
+	a >>= 1;
+	a |= GetCarry() ? 0x80 : 0;
+	SetCarry(old_a & 0x01);
 	SetZero(a == 0);
 	SetNegative(a & 0x80);
 }

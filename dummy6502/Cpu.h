@@ -59,6 +59,7 @@ namespace dummy6502
 		uint16_t Immediate();
 		uint16_t ZeroPage();
 		uint16_t ZeroPageX();
+		uint16_t ZeroPageY();
 		uint16_t AbsoluteValue();
 		uint16_t AbsoluteValueX();
 		uint16_t AbsoluteValueXAlwaysCross();
@@ -69,6 +70,9 @@ namespace dummy6502
 		uint16_t AbsoluteAddress();
 		uint16_t AbsoluteAddressX();
 		uint16_t AbsoluteAddressY();
+		uint16_t AbsoluteAddressPlusOne();
+		uint16_t AbsoluteAddressXPlusOne();
+		uint16_t AbsoluteAddressYPlusOne();
 
 		uint16_t BranchAddress();
 
@@ -114,12 +118,21 @@ namespace dummy6502
 		void LDX();
 		void LDY();
 		void NOP();
+		void ORA();
 		void RTI();
 		void RTS();
 		void SBC();
 		void STA();
+		void TAX();
 		void TXA();
+		void INY();
+		void DEX();
+		void DEY();
+		void TAY();
+		void TYA();
 		void LSR();
+		void ROL();
+		void ROR();
 
 		void UnimplementedOpcode();
 

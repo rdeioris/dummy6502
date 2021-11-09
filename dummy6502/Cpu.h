@@ -139,6 +139,8 @@ namespace dummy6502
 		void PLA();
 		void PHP();
 		void PLP();
+		void STX();
+		void STY();
 
 		void UnimplementedOpcode();
 

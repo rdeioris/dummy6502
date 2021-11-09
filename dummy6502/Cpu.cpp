@@ -183,6 +183,14 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 	OPCODE(0x68, Implied, PLA);
 	OPCODE(0x08, Implied, PHP);
 	OPCODE(0x28, Implied, PLP);
+
+	OPCODE(0x86, ZeroPage, STX);
+	OPCODE(0x96, ZeroPageY, STX);
+	OPCODE(0x8E, AbsoluteAddressPlusOne, STX);
+
+	OPCODE(0x84, ZeroPage, STY);
+	OPCODE(0x94, ZeroPageX, STY);
+	OPCODE(0x8C, AbsoluteAddressPlusOne, STY);
 }
 
 uint16_t dummy6502::Cpu::Implied()
@@ -979,4 +987,14 @@ void dummy6502::Cpu::PLP()
 {
 	flags = Pop();
 	ticks += 3;
+}
+
+void dummy6502::Cpu::STX()
+{
+	memory_controller.Write8(opcode_address, x);
+}
+
+void dummy6502::Cpu::STY()
+{
+	memory_controller.Write8(opcode_address, y);
 }

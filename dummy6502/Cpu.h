@@ -133,6 +133,12 @@ namespace dummy6502
 		void LSR();
 		void ROL();
 		void ROR();
+		void TXS();
+		void TSX();
+		void PHA();
+		void PLA();
+		void PHP();
+		void PLP();
 
 		void UnimplementedOpcode();
 

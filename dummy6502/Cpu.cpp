@@ -177,6 +177,12 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 	OPCODE(0x81, IndirectX, STA);
 	OPCODE(0x91, IndirectY, STA);
 
+	OPCODE(0x9A, Implied, TXS);
+	OPCODE(0xBA, Implied, TSX);
+	OPCODE(0x48, Implied, PHA);
+	OPCODE(0x68, Implied, PLA);
+	OPCODE(0x08, Implied, PHP);
+	OPCODE(0x28, Implied, PLP);
 }
 
 uint16_t dummy6502::Cpu::Implied()
@@ -937,4 +943,40 @@ void dummy6502::Cpu::INC()
 	ticks += 2;
 	SetZero(value == 0);
 	SetNegative(value & 0x80);
+}
+
+void dummy6502::Cpu::TXS()
+{
+	s = x;
+	ticks++;
+}
+
+void dummy6502::Cpu::TSX()
+{
+	x = s;
+	ticks++;
+}
+
+void dummy6502::Cpu::PHA()
+{
+	Push(a);
+	ticks += 2;
+}
+
+void dummy6502::Cpu::PLA()
+{
+	a = Pop();
+	ticks += 3;
+}
+
+void dummy6502::Cpu::PHP()
+{
+	Push(flags);
+	ticks += 2;
+}
+
+void dummy6502::Cpu::PLP()
+{
+	flags = Pop();
+	ticks += 3;
 }

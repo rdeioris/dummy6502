@@ -244,7 +244,7 @@ uint16_t dummy6502::Cpu::IndirectX()
 	ticks++;
 	uint16_t indirect_address = memory_controller.Read16(zero_page_address);
 	ticks += 2;
-	opcode_address = zero_page_address;
+	opcode_address = indirect_address;
 	opcode_value = memory_controller.Read8(indirect_address);
 	ticks++;
 	return 1;
@@ -264,7 +264,7 @@ uint16_t dummy6502::Cpu::IndirectY()
 		ticks++;
 	}
 	ticks++;
-	opcode_address = zero_page_address;
+	opcode_address = indirect_address;
 	opcode_value = memory_controller.Read8(indirect_address);
 	ticks++;
 	return 1;
@@ -377,6 +377,7 @@ uint16_t dummy6502::Cpu::AbsoluteAddressXPlusOne()
 	{
 		ticks++;
 	}
+	ticks++;
 	return size;
 }
 
@@ -389,6 +390,7 @@ uint16_t dummy6502::Cpu::AbsoluteAddressYPlusOne()
 	{
 		ticks++;
 	}
+	ticks++;
 	return size;
 }
 

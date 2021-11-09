@@ -12,7 +12,7 @@ uint8_t dummy6502::Ram::Read8(const uint16_t address)
 
 uint16_t dummy6502::Ram::Read16(const uint16_t address)
 {
-	return (static_cast<uint16_t>(data[address + 1]) << 8) & data[address];
+	return (static_cast<uint16_t>(data[address + 1]) << 8) | data[address];
 }
 
 void dummy6502::Ram::Write8(const uint16_t address, const uint8_t value)

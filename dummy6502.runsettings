@@ -2,7 +2,7 @@
 <RunSettings>
 
   <Catch2Adapter>
-    <FilenameFilter>^dummy6502</FilenameFilter>
+    <FilenameFilter>^dummy6502_tests</FilenameFilter>
   </Catch2Adapter>
 
 </RunSettings>

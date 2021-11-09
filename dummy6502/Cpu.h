@@ -62,10 +62,17 @@ namespace dummy6502
 		uint16_t AbsoluteValue();
 		uint16_t AbsoluteValueX();
 		uint16_t AbsoluteValueY();
+		uint16_t IndirectX();
+		uint16_t IndirectY();
 
 		uint16_t AbsoluteAddress();
 		uint16_t AbsoluteAddressX();
 		uint16_t AbsoluteAddressY();
+
+		uint16_t BranchAddress();
+
+		uint16_t Accumulator();
+		uint16_t Indirect();
 
 		void Push(const uint8_t value);
 		uint8_t Pop();
@@ -79,16 +86,26 @@ namespace dummy6502
 		void BCC();
 		void BCS();
 		void BEQ();
+		void BNE();
+		void BMI();
+		void BPL();
+		void BVC();
+		void BVS();
 		void BRK();
 		void CLI();
 		void INX();
 		void JMP();
 		void JSR();
 		void LDA();
+		void LDX();
+		void LDY();
 		void NOP();
 		void RTI();
 		void RTS();
+		void SBC();
 		void STA();
+		void TXA();
+		void LSR();
 
 		void UnimplementedOpcode();
 

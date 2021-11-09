@@ -11,6 +11,7 @@ TEST_CASE("dummy6502.OpCodes.ADC")
 		REQUIRE(machine.cpu.a == 0x44);
 		REQUIRE(!machine.cpu.GetZero());
 		REQUIRE(!machine.cpu.GetCarry());
+		REQUIRE(!machine.cpu.GetOverflow());
 		REQUIRE(machine.cpu.ticks == 2);
 	}
 
@@ -51,7 +52,7 @@ TEST_CASE("dummy6502.OpCodes.ADC")
 
 	SECTION("ADC ZeroPage")
 	{
-		auto machine = TestMachine({ 0x65, 0x00});
+		auto machine = TestMachine({ 0x65, 0x00 });
 		machine.ram.Write8(0, 1);
 		machine.cpu.a = 0x1;
 		machine.Tick();
@@ -144,5 +145,72 @@ TEST_CASE("dummy6502.OpCodes.ADC")
 		REQUIRE(!machine.cpu.GetZero());
 		REQUIRE(!machine.cpu.GetCarry());
 		REQUIRE(machine.cpu.ticks == 4);
+	}
+
+	SECTION("ADC (Indirect, X)")
+	{
+		auto machine = TestMachine({ 0x61, 0x01, 0xEA, 0xEA, 0x05 });
+		machine.ram.Write16(0x02, 0x1004);
+		machine.cpu.x = 0x1;
+		machine.cpu.a = 0x2;
+		machine.Tick();
+
+		REQUIRE(machine.cpu.a == 0x07);
+		REQUIRE(!machine.cpu.GetZero());
+		REQUIRE(!machine.cpu.GetCarry());
+		REQUIRE(machine.cpu.ticks == 6);
+	}
+
+	SECTION("ADC (Indirect), Y")
+	{
+		auto machine = TestMachine({ 0x71, 0x02, 0xEA, 0xEA, 0x09 });
+		machine.ram.Write16(0x02, 0x1000);
+		machine.cpu.y = 0x4;
+		machine.cpu.a = 0x2;
+		machine.Tick();
+
+		REQUIRE(machine.cpu.a == 0x0B);
+		REQUIRE(!machine.cpu.GetZero());
+		REQUIRE(!machine.cpu.GetCarry());
+		REQUIRE(machine.cpu.ticks == 6);
+	}
+
+	SECTION("ADC No Overflow and Carry")
+	{
+		auto machine = TestMachine({ 0x69, 0x02 });
+		machine.cpu.a = 0xFF;
+		machine.Tick();
+
+		REQUIRE(machine.cpu.a == 0x01);
+		REQUIRE(!machine.cpu.GetZero());
+		REQUIRE(machine.cpu.GetCarry());
+		REQUIRE(!machine.cpu.GetOverflow());
+		REQUIRE(machine.cpu.ticks == 2);
+	}
+
+	SECTION("ADC Overflow and No Carry")
+	{
+		auto machine = TestMachine({ 0x69, 0x02 });
+		machine.cpu.a = 0x7F;
+		machine.Tick();
+
+		REQUIRE(machine.cpu.a == 0x81);
+		REQUIRE(!machine.cpu.GetZero());
+		REQUIRE(!machine.cpu.GetCarry());
+		REQUIRE(machine.cpu.GetOverflow());
+		REQUIRE(machine.cpu.ticks == 2);
+	}
+
+	SECTION("ADC Overflow and Carry")
+	{
+		auto machine = TestMachine({ 0x69, 0xFF });
+		machine.cpu.a = 0x80;
+		machine.Tick();
+
+		REQUIRE(machine.cpu.a == 0x7F);
+		REQUIRE(!machine.cpu.GetZero());
+		REQUIRE(machine.cpu.GetCarry());
+		REQUIRE(machine.cpu.GetOverflow());
+		REQUIRE(machine.cpu.ticks == 2);
 	}
 }

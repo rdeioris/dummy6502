@@ -56,5 +56,16 @@ TEST_CASE("dummy6502.OpCodes.DEC")
 
 TEST_CASE("dummy6502.OpCodes.INC")
 {
+	SECTION("INC 0x0203, X")
+	{
+		auto machine = TestMachine({ 0xFE, 0x03, 0x02 });
+		machine.cpu.x = 2;
+		machine.memory_controller.Write8(0x0205, 0x0C);
+		machine.Tick();
 
+		REQUIRE(machine.memory_controller.Read8(0x0205) == 0x0D);
+		REQUIRE(!machine.cpu.GetZero());
+		REQUIRE(!machine.cpu.GetNegative());
+		REQUIRE(machine.cpu.ticks == 7);
+	}
 }

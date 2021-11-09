@@ -104,7 +104,7 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 	OPCODE(0xBD, AbsoluteValueX, LDA);
 	OPCODE(0xB9, AbsoluteValueY, LDA);
 	OPCODE(0xA1, IndirectX, LDA);
-	OPCODE(0xB1, IndirectY, LDA);
+	OPCODE(0xB1, IndirectYMinusOne, LDA);
 
 	OPCODE(0xA2, Immediate, LDX);
 	OPCODE(0xA6, ZeroPage, LDX);
@@ -380,6 +380,13 @@ uint16_t dummy6502::Cpu::AbsoluteAddressPlusOne()
 {
 	ticks++;
 	return AbsoluteAddress();
+}
+
+uint16_t dummy6502::Cpu::IndirectYMinusOne()
+{
+	uint16_t size = IndirectY();
+	ticks--;
+	return size;
 }
 
 uint16_t dummy6502::Cpu::AbsoluteAddressXPlusOne()

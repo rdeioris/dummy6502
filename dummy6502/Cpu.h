@@ -66,6 +66,7 @@ namespace dummy6502
 		uint16_t AbsoluteValueY();
 		uint16_t IndirectX();
 		uint16_t IndirectY();
+		uint16_t IndirectYMinusOne();
 
 		uint16_t AbsoluteAddress();
 		uint16_t AbsoluteAddressX();

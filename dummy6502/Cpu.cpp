@@ -28,13 +28,89 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 	OPCODE(0x21, IndirectX, AND);
 	OPCODE(0x31, IndirectY, AND);
 
+	OPCODE(0x0A, Accumulator, ASL);
+	OPCODE(0x06, ZeroPage, ASL);
+	OPCODE(0x16, ZeroPageX, ASL);
+	OPCODE(0x0E, AbsoluteValue, ASL);
+	OPCODE(0x1E, AbsoluteValueX, ASL);
+
+	OPCODE(0x0A, ZeroPage, BIT);
+	OPCODE(0x06, AbsoluteValue, BIT);
+
+	OPCODE(0x10, BranchAddress, BPL);
+	OPCODE(0x30, BranchAddress, BMI);
+	OPCODE(0x50, BranchAddress, BVC);
+	OPCODE(0x70, BranchAddress, BVS);
+	OPCODE(0x90, BranchAddress, BCC);
+	OPCODE(0xB0, BranchAddress, BCS);
+	OPCODE(0xD0, BranchAddress, BNE);
+	OPCODE(0xF0, BranchAddress, BEQ);
+
 	OPCODE(0x00, Implied, BRK);
-	OPCODE(0x20, AbsoluteAddress, JSR);
-	OPCODE(0xEA, Implied, NOP);
+
+	OPCODE(0xC9, Immediate, CMP);
+	OPCODE(0xC5, ZeroPage, CMP);
+	OPCODE(0xD5, ZeroPageX, CMP);
+	OPCODE(0xCD, AbsoluteValue, CMP);
+	OPCODE(0xDD, AbsoluteValueX, CMP);
+	OPCODE(0xD9, AbsoluteValueY, CMP);
+	OPCODE(0xC1, IndirectX, CMP);
+	OPCODE(0xD1, IndirectY, CMP);
+
+	OPCODE(0xE0, Immediate, CPX);
+	OPCODE(0xE4, ZeroPage, CPX);
+	OPCODE(0xEC, AbsoluteValue, CPX);
+
+	OPCODE(0xC0, Immediate, CPY);
+	OPCODE(0xC4, ZeroPage, CPY);
+	OPCODE(0xCC, AbsoluteValue, CPY);
+
+	OPCODE(0xC6, ZeroPage, DEC);
+	OPCODE(0xD6, ZeroPageX, DEC);
+	OPCODE(0xCE, AbsoluteValue, DEC);
+	OPCODE(0xDE, AbsoluteValueXAlwaysCross, DEC);
+
+	OPCODE(0x49, Immediate, EOR);
+	OPCODE(0x45, ZeroPage, EOR);
+	OPCODE(0x55, ZeroPageX, EOR);
+	OPCODE(0x4D, AbsoluteValue, EOR);
+	OPCODE(0x5D, AbsoluteValueX, EOR);
+	OPCODE(0x59, AbsoluteValueY, EOR);
+	OPCODE(0x41, IndirectX, EOR);
+	OPCODE(0x51, IndirectY, EOR);
+
+	OPCODE(0x18, Implied, CLC);
+	OPCODE(0x38, Implied, SEC);
 	OPCODE(0x58, Implied, CLI);
+	OPCODE(0x78, Implied, SEI);
+	OPCODE(0xB8, Implied, CLV);
+	OPCODE(0xD8, Implied, CLD);
+	OPCODE(0xF8, Implied, SED);
+
+	OPCODE(0xE6, ZeroPage, INC);
+	OPCODE(0xF6, ZeroPageX, INC);
+	OPCODE(0xEE, AbsoluteValue, INC);
+	OPCODE(0xFE, AbsoluteValueXAlwaysCross, INC);
 
 	OPCODE(0x4C, AbsoluteAddress, JMP);
 	OPCODE(0x6C, Indirect, JMP);
+
+	OPCODE(0x20, AbsoluteAddress, JSR);
+
+	OPCODE(0xA9, Immediate, LDA);
+	OPCODE(0xA5, ZeroPage, LDA);
+	OPCODE(0xB5, ZeroPageX, LDA);
+	OPCODE(0xAD, AbsoluteValue, LDA);
+	OPCODE(0xBD, AbsoluteValueX, LDA);
+	OPCODE(0xB9, AbsoluteValueY, LDA);
+	OPCODE(0xA1, IndirectX, LDA);
+	OPCODE(0xB1, IndirectY, LDA);
+
+
+	OPCODE(0xEA, Implied, NOP);
+	
+
+	
 
 	OPCODE(0x40, Implied, RTI);
 	OPCODE(0x60, Implied, RTS);
@@ -51,14 +127,7 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 
 	OPCODE(0xE8, Implied, INX);
 
-	OPCODE(0x10, BranchAddress, BPL);
-	OPCODE(0x30, BranchAddress, BMI);
-	OPCODE(0x50, BranchAddress, BVC);
-	OPCODE(0x70, BranchAddress, BVS);
-	OPCODE(0x90, BranchAddress, BCC);
-	OPCODE(0xB0, BranchAddress, BCS);
-	OPCODE(0xD0, BranchAddress, BNE);
-	OPCODE(0xF0, BranchAddress, BEQ);
+
 
 	OPCODE(0xE9, Immediate, SBC);
 
@@ -93,9 +162,9 @@ uint16_t dummy6502::Cpu::Immediate()
 
 uint16_t dummy6502::Cpu::ZeroPage()
 {
-	uint8_t zero_page_address = Read8FromPc();
+	opcode_address = Read8FromPc();
 	ticks++;
-	opcode_value = memory_controller.Read8(zero_page_address);
+	opcode_value = memory_controller.Read8(opcode_address);
 	ticks++;
 	return 1;
 }
@@ -107,7 +176,8 @@ uint16_t dummy6502::Cpu::ZeroPageX()
 	ticks++;
 	zero_page_address += x;
 	ticks++;
-	opcode_value = memory_controller.Read8(zero_page_address);
+	opcode_address = zero_page_address;
+	opcode_value = memory_controller.Read8(opcode_address);
 	ticks++;
 	return 1;
 }
@@ -121,6 +191,7 @@ uint16_t dummy6502::Cpu::IndirectX()
 	ticks++;
 	uint16_t indirect_address = memory_controller.Read16(zero_page_address);
 	ticks += 2;
+	opcode_address = zero_page_address;
 	opcode_value = memory_controller.Read8(indirect_address);
 	ticks++;
 	return 1;
@@ -140,6 +211,7 @@ uint16_t dummy6502::Cpu::IndirectY()
 		ticks++;
 	}
 	ticks++;
+	opcode_address = zero_page_address;
 	opcode_value = memory_controller.Read8(indirect_address);
 	ticks++;
 	return 1;
@@ -167,43 +239,61 @@ uint16_t dummy6502::Cpu::Indirect()
 
 uint16_t dummy6502::Cpu::AbsoluteValue()
 {
-	uint16_t absolute_address = Read16FromPc();
-	addressing_mode_disassembly = std::format("${:04X}", absolute_address);
+	opcode_address = Read16FromPc();
+	addressing_mode_disassembly = std::format("${:04X}", opcode_address);
 	ticks += 2;
-	opcode_value = memory_controller.Read8(absolute_address);
+	opcode_value = memory_controller.Read8(opcode_address);
 	ticks++;
 	return 2;
 }
 
 uint16_t dummy6502::Cpu::AbsoluteValueX()
 {
-	uint16_t absolute_address = Read16FromPc();
-	addressing_mode_disassembly = std::format("${:04X}, X", absolute_address);
+	uint16_t size = AbsoluteAddressX();
+	opcode_value = memory_controller.Read8(opcode_address);
+	ticks++;
+	return size;
+}
+
+uint16_t dummy6502::Cpu::AbsoluteValueXAlwaysCross()
+{
+	ticks++;
+	return AbsoluteValueX();
+}
+
+uint16_t dummy6502::Cpu::AbsoluteAddressX()
+{
+	opcode_address = Read16FromPc();
+	addressing_mode_disassembly = std::format("${:04X}, X", opcode_address);
 	ticks += 2;
-	uint16_t page = absolute_address & 0xFF00;
-	absolute_address += x;
-	if (page != (absolute_address & 0xFF00))
+	uint16_t page = opcode_address & 0xFF00;
+	opcode_address += x;
+	if (page != (opcode_address & 0xFF00))
 	{
 		ticks++;
 	}
-	opcode_value = memory_controller.Read8(absolute_address);
-	ticks++;
 	return 2;
 }
 
 uint16_t dummy6502::Cpu::AbsoluteValueY()
 {
-	uint16_t absolute_address = Read16FromPc();
-	addressing_mode_disassembly = std::format("${:04X}, Y", absolute_address);
+	uint16_t size = AbsoluteAddressY();
+	opcode_value = memory_controller.Read8(opcode_address);
+	ticks++;
+	return size;
+}
+
+uint16_t dummy6502::Cpu::AbsoluteAddressY()
+{
+	opcode_address = Read16FromPc();
+	addressing_mode_disassembly = std::format("${:04X}, Y", opcode_address);
 	ticks += 2;
-	uint16_t page = absolute_address & 0xFF00;
-	absolute_address += y;
-	if (page != (absolute_address & 0xFF00))
+	uint16_t page = opcode_address & 0xFF00;
+	opcode_address += y;
+	if (page != (opcode_address & 0xFF00))
 	{
 		ticks++;
 	}
-	opcode_value = memory_controller.Read8(absolute_address);
-	ticks++;
 	return 2;
 }
 
@@ -358,6 +448,34 @@ void dummy6502::Cpu::AND()
 	SetNegative(a & 0x80);
 }
 
+void dummy6502::Cpu::BIT()
+{
+	SetZero(opcode_value & a);
+	SetNegative(opcode_value >> 7);
+	SetOverflow((opcode_value >> 6) & 0x01);
+}
+
+void dummy6502::Cpu::CMP()
+{
+	SetCarry(a >= opcode_value);
+	SetZero(opcode_value == a);
+	SetNegative(a < opcode_value);
+}
+
+void dummy6502::Cpu::CPX()
+{
+	SetCarry(x >= opcode_value);
+	SetZero(opcode_value == x);
+	SetNegative(x < opcode_value);
+}
+
+void dummy6502::Cpu::CPY()
+{
+	SetCarry(y >= opcode_value);
+	SetZero(opcode_value == y);
+	SetNegative(y < opcode_value);
+}
+
 void dummy6502::Cpu::TXA()
 {
 	a = x;
@@ -372,6 +490,22 @@ void dummy6502::Cpu::SBC()
 	SetCarry(a > old_a);
 	SetZero(a == 0);
 	SetOverflow(((a ^ opcode_value) & (a ^ old_a)) >> 7);
+	SetNegative(a & 0x80);
+}
+
+void dummy6502::Cpu::ASL()
+{
+	uint8_t old_a = a;
+	a <<= 1;
+	SetCarry(old_a >> 7);
+	SetZero(a == 0);
+	SetNegative(a & 0x80);
+}
+
+void dummy6502::Cpu::EOR()
+{
+	a ^= opcode_value;
+	SetZero(a == 0);
 	SetNegative(a & 0x80);
 }
 
@@ -399,6 +533,40 @@ void dummy6502::Cpu::NOP()
 void dummy6502::Cpu::CLI()
 {
 	SetInterruptDisable(false);
+	ticks++;
+}
+
+void dummy6502::Cpu::SEI()
+{
+	SetInterruptDisable(true);
+	ticks++;
+}
+
+void dummy6502::Cpu::CLC()
+{
+	SetCarry(false);
+	ticks++;
+}
+
+void dummy6502::Cpu::SEC()
+{
+	SetCarry(true);
+	ticks++;
+}
+
+void dummy6502::Cpu::CLD()
+{
+	ticks++;
+}
+
+void dummy6502::Cpu::SED()
+{
+	ticks++;
+}
+
+void dummy6502::Cpu::CLV()
+{
+	SetOverflow(false);
 	ticks++;
 }
 
@@ -586,4 +754,22 @@ void dummy6502::Cpu::BVC()
 		}
 		pc = opcode_address;
 	}
+}
+
+void dummy6502::Cpu::DEC()
+{
+	uint8_t value = opcode_value - 1;
+	memory_controller.Write8(opcode_address, value);
+	ticks += 2;
+	SetZero(value == 0);
+	SetNegative(value & 0x80);
+}
+
+void dummy6502::Cpu::INC()
+{
+	uint8_t value = opcode_value + 1;
+	memory_controller.Write8(opcode_address, value);
+	ticks += 2;
+	SetZero(value == 0);
+	SetNegative(value & 0x80);
 }

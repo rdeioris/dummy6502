@@ -61,6 +61,7 @@ namespace dummy6502
 		uint16_t ZeroPageX();
 		uint16_t AbsoluteValue();
 		uint16_t AbsoluteValueX();
+		uint16_t AbsoluteValueXAlwaysCross();
 		uint16_t AbsoluteValueY();
 		uint16_t IndirectX();
 		uint16_t IndirectY();
@@ -83,6 +84,7 @@ namespace dummy6502
 		void ADC();
 		void AND();
 		void ASL();
+		void BIT();
 		void BCC();
 		void BCS();
 		void BEQ();
@@ -93,6 +95,18 @@ namespace dummy6502
 		void BVS();
 		void BRK();
 		void CLI();
+		void CLC();
+		void SEC();
+		void SEI();
+		void CLV();
+		void CLD();
+		void SED();
+		void CMP();
+		void CPX();
+		void CPY();
+		void DEC();
+		void EOR();
+		void INC();
 		void INX();
 		void JMP();
 		void JSR();

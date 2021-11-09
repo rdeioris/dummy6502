@@ -152,6 +152,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="opcodes_adc_test.cpp" />
     <ClCompile Include="opcodes_branch_test.cpp" />
+    <ClCompile Include="opcodes_dec_inc_test.cpp" />
+    <ClCompile Include="opcodes_flags_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestMachine.h" />

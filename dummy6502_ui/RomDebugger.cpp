@@ -15,26 +15,33 @@ void RomDebugger::Init(DummyMachine& machine, SDL_Window* window, SDL_Renderer* 
 	file_dialog.SetTitle("Select ROM");
 }
 
+void RomDebugger::LoadRom(DummyMachine& machine)
+{
+	auto cartridge = std::vector<uint8_t>(0x8000, 0xEA);
+	SDL_RWops* ops = SDL_RWFromFile(rom_image.string().c_str(), "r+b");
+	SDL_RWread(ops, cartridge.data(), 1, 0x8000);
+	SDL_RWclose(ops);
+	memory_controller.Remap(0x8000, 0xFFFF, std::make_shared<dummy6502::Rom>(cartridge));
+	file_dialog.ClearSelected();
+	disassembly.clear();
+	uint16_t disassembly_base = 0x8000;
+	while (disassembly_base <= 0xFFF7)
+	{
+		uint16_t current_line = disassembly_base;
+		std::string line = machine.cpu.GetDisassembly(disassembly_base);
+		disassembly.push_back({ current_line, line });
+	}
+
+}
+
 void RomDebugger::Tick(DummyMachine& machine)
 {
 	file_dialog.Display();
 
 	if (file_dialog.HasSelected())
 	{
-		auto cartridge = std::vector<uint8_t>(0x8000, 0xEA);
-		SDL_RWops* ops = SDL_RWFromFile(file_dialog.GetSelected().string().c_str(), "r+b");
-		SDL_RWread(ops, cartridge.data(), 1, 0x8000);
-		SDL_RWclose(ops);
-		memory_controller.Remap(0x8000, 0xFFFF, std::make_shared<dummy6502::Rom>(cartridge));
-		file_dialog.ClearSelected();
-		disassembly.clear();
-		uint16_t disassembly_base = 0x8000;
-		while (disassembly_base <= 0xFFF7)
-		{
-			uint16_t current_line = disassembly_base;
-			std::string line = machine.cpu.GetDisassembly(disassembly_base);
-			disassembly.push_back({ current_line, line });
-		}
+		rom_image = file_dialog.GetSelected();
+		LoadRom(machine);
 	}
 
 	{
@@ -43,6 +50,19 @@ void RomDebugger::Tick(DummyMachine& machine)
 		if (ImGui::Button("Load ROM"))
 		{
 			file_dialog.Open();
+		}
+
+		if (!rom_image.empty())
+		{
+			ImGui::SameLine();
+			if (ImGui::Button("Reload ROM"))
+			{
+				LoadRom(machine);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("%s", rom_image.string().c_str());
+			}
 		}
 
 		ImGui::BeginTable("", 0x11, ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoKeepColumnsVisible);

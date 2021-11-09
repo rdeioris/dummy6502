@@ -19,8 +19,12 @@ public:
 	virtual void Init(class DummyMachine& machine, SDL_Window* window, SDL_Renderer* renderer) override;
 	virtual void Tick(class DummyMachine& machine) override;
 protected:
+	void LoadRom(DummyMachine& machine);
+
 	ImGui::FileBrowser file_dialog;
 	std::vector<std::pair<uint16_t, std::string>> disassembly;
 
 	dummy6502::SharedPtrMemoryController& memory_controller;
+
+	std::filesystem::path rom_image;
 };

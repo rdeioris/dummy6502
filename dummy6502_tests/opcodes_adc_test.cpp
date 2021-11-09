@@ -172,7 +172,7 @@ TEST_CASE("dummy6502.OpCodes.ADC")
 		REQUIRE(machine.cpu.a == 0x0B);
 		REQUIRE(!machine.cpu.GetZero());
 		REQUIRE(!machine.cpu.GetCarry());
-		REQUIRE(machine.cpu.ticks == 6);
+		REQUIRE(machine.cpu.ticks == 5);
 	}
 
 	SECTION("ADC No Overflow and Carry")

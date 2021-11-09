@@ -104,7 +104,7 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 	OPCODE(0xBD, AbsoluteValueX, LDA);
 	OPCODE(0xB9, AbsoluteValueY, LDA);
 	OPCODE(0xA1, IndirectX, LDA);
-	OPCODE(0xB1, IndirectYMinusOne, LDA);
+	OPCODE(0xB1, IndirectY, LDA);
 
 	OPCODE(0xA2, Immediate, LDX);
 	OPCODE(0xA6, ZeroPage, LDX);
@@ -175,7 +175,7 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 	OPCODE(0x9D, AbsoluteAddressXPlusOne, STA);
 	OPCODE(0x99, AbsoluteAddressYPlusOne, STA);
 	OPCODE(0x81, IndirectX, STA);
-	OPCODE(0x91, IndirectY, STA);
+	OPCODE(0x91, IndirectYAlwaysCross, STA);
 
 	OPCODE(0x9A, Implied, TXS);
 	OPCODE(0xBA, Implied, TSX);
@@ -280,7 +280,6 @@ uint16_t dummy6502::Cpu::IndirectY()
 	ticks++;
 	opcode_address = indirect_address;
 	opcode_value = memory_controller.Read8(indirect_address);
-	ticks++;
 	return 1;
 }
 
@@ -326,6 +325,18 @@ uint16_t dummy6502::Cpu::AbsoluteValueXAlwaysCross()
 	uint16_t size = AbsoluteValueX();
 	uint64_t after_ticks = ticks;
 	if (after_ticks - before_ticks < 4)
+	{
+		ticks++;
+	}
+	return size;
+}
+
+uint16_t dummy6502::Cpu::IndirectYAlwaysCross()
+{
+	uint64_t before_ticks = ticks;
+	uint16_t size = IndirectY();
+	uint64_t after_ticks = ticks;
+	if (after_ticks - before_ticks < 5)
 	{
 		ticks++;
 	}
@@ -380,13 +391,6 @@ uint16_t dummy6502::Cpu::AbsoluteAddressPlusOne()
 {
 	ticks++;
 	return AbsoluteAddress();
-}
-
-uint16_t dummy6502::Cpu::IndirectYMinusOne()
-{
-	uint16_t size = IndirectY();
-	ticks--;
-	return size;
 }
 
 uint16_t dummy6502::Cpu::AbsoluteAddressXPlusOne()

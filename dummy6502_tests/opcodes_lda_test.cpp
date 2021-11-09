@@ -40,6 +40,21 @@ TEST_CASE("dummy6502.OpCodes.LDA")
 		REQUIRE(machine.cpu.ticks == 5);
 	}
 
+	SECTION("LDA ($01), Y cross boundary")
+	{
+		auto machine = TestMachine({ 0xB1, 0x01 });
+		machine.cpu.y = 1;
+		machine.memory_controller.Write8(0x01, 0xFF);
+		machine.memory_controller.Write8(0x02, 0x02);
+		machine.memory_controller.Write8(0x0300, 0x30);
+		machine.Tick();
+
+		REQUIRE(machine.cpu.a == 0x30);
+		REQUIRE(!machine.cpu.GetZero());
+		REQUIRE(!machine.cpu.GetNegative());
+		REQUIRE(machine.cpu.ticks == 6);
+	}
+
 	SECTION("LDA ($01, X)")
 	{
 		auto machine = TestMachine({ 0xA1, 0x01 });

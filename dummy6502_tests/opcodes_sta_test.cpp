@@ -81,4 +81,17 @@ TEST_CASE("dummy6502.OpCodes.STA")
 		REQUIRE(machine.memory_controller.Read8(0x0404) == 0x17);
 		REQUIRE(machine.cpu.ticks == 6);
 	}
+
+	SECTION("STA ($00), Y cross boundary")
+	{
+		auto machine = TestMachine({ 0x91, 0x00 });
+		machine.cpu.a = 0x17;
+		machine.cpu.y = 1;
+		machine.memory_controller.Write8(0, 0xFF);
+		machine.memory_controller.Write8(1, 0x04);
+		machine.Tick();
+
+		REQUIRE(machine.memory_controller.Read8(0x0500) == 0x17);
+		REQUIRE(machine.cpu.ticks == 6);
+	}
 }

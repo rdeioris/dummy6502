@@ -548,8 +548,9 @@ void dummy6502::Cpu::UnimplementedOpcode()
 void dummy6502::Cpu::ADC()
 {
 	uint8_t old_a = a;
-	a = old_a + opcode_value + (GetCarry() ? 1 : 0);
-	SetCarry(a < old_a);
+	uint8_t carry = GetCarry() ? 1 : 0;
+	a = old_a + opcode_value + carry;
+	SetCarry(a < (old_a + carry));
 	SetZero(a == 0);
 	SetOverflow(((a ^ opcode_value) & (a ^ old_a)) >> 7);
 	SetNegative(a & 0x80);
@@ -655,12 +656,8 @@ void dummy6502::Cpu::INY()
 
 void dummy6502::Cpu::SBC()
 {
-	uint8_t old_a = a;
-	a = old_a - opcode_value - (GetCarry() ? 1 : 0);
-	SetCarry(a > old_a);
-	SetZero(a == 0);
-	SetOverflow(((a ^ opcode_value) & (a ^ old_a)) >> 7);
-	SetNegative(a & 0x80);
+	opcode_value = ~opcode_value;
+	ADC();
 }
 
 void dummy6502::Cpu::ASL()

@@ -213,4 +213,17 @@ TEST_CASE("dummy6502.OpCodes.ADC")
 		REQUIRE(machine.cpu.GetOverflow());
 		REQUIRE(machine.cpu.ticks == 2);
 	}
+
+	SECTION("ADC With Carry")
+	{
+		auto machine = TestMachine({ 0x38, 0x69, 0x1 });
+		machine.cpu.a = 0x80;
+		machine.Tick(2);
+
+		REQUIRE(machine.cpu.a == 0x82);
+		REQUIRE(!machine.cpu.GetZero());
+		REQUIRE(!machine.cpu.GetCarry());
+		REQUIRE(!machine.cpu.GetOverflow());
+		REQUIRE(machine.cpu.ticks == 4);
+	}
 }

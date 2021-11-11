@@ -224,19 +224,21 @@ int main(int argc, char** argv)
 
 			ImGui::Text("Top: $%02X", machine.cpu.s);
 
-			ImGui::BeginTable("", 2, ImGuiTableFlags_Borders);
-			uint8_t stack_base = machine.cpu.s;
-			stack_base++;
-			for (uint16_t address = (0x0100 + stack_base); address < 0x0200; address++)
+			if (ImGui::BeginTable("", 2, ImGuiTableFlags_Borders))
 			{
+				uint8_t stack_base = machine.cpu.s;
+				stack_base++;
+				for (uint16_t address = (0x0100 + stack_base); address < 0x0200; address++)
+				{
 
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::Text("$%02X", address - 0x0100);
-				ImGui::TableNextColumn();
-				ImGui::Text("%02X", memory_controller.Read8(address));
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+					ImGui::Text("$%02X", address - 0x0100);
+					ImGui::TableNextColumn();
+					ImGui::Text("%02X", memory_controller.Read8(address));
+				}
+				ImGui::EndTable();
 			}
-			ImGui::EndTable();
 
 			ImGui::End();
 		}

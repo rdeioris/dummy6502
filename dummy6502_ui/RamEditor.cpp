@@ -75,25 +75,28 @@ void RamEditor::Tick(DummyMachine& machine)
 					machine.cpu.memory_controller.Write8(address, std::rand() % 256);
 				}
 			}
-			ImGui::BeginTable("", 0x10, ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoKeepColumnsVisible);
-			for (uint16_t address = page_base; address < (page_base + 256); address++)
+			
+			if (ImGui::BeginTable("RAM table", 0x10, ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoKeepColumnsVisible))
 			{
-				if (address % 0x10 == 0)
+				for (uint16_t address = page_base; address < (page_base + 256); address++)
 				{
-					ImGui::TableNextRow();
+					if (address % 0x10 == 0)
+					{
+						ImGui::TableNextRow();
+					}
+					ImGui::TableNextColumn();
+					ImGui::Text("%02X", machine.cpu.memory_controller.Read8(address));
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("$%04X", address);
+					if (ImGui::IsItemClicked())
+					{
+						ram_editor_address = address;
+						std::snprintf(hex_buf, 3, "%02X", machine.cpu.memory_controller.Read8(ram_editor_address));
+						open_ram_editor = true;
+					}
 				}
-				ImGui::TableNextColumn();
-				ImGui::Text("%02X", machine.cpu.memory_controller.Read8(address));
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip("$%04X", address);
-				if (ImGui::IsItemClicked())
-				{
-					ram_editor_address = address;
-					std::snprintf(hex_buf, 3, "%02X", machine.cpu.memory_controller.Read8(ram_editor_address));
-					open_ram_editor = true;
-				}
+				ImGui::EndTable();
 			}
-			ImGui::EndTable();
 
 			ImGui::NewLine();
 		}

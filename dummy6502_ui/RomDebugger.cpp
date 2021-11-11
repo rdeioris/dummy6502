@@ -65,35 +65,37 @@ void RomDebugger::Tick(DummyMachine& machine)
 			}
 		}
 
-		ImGui::BeginTable("", 0x11, ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoKeepColumnsVisible);
-		ImGuiListClipper clipper;
-		clipper.Begin(32768 / 16);
-		while (clipper.Step())
+		if (ImGui::BeginTable("ROM table", 0x11, ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoKeepColumnsVisible))
 		{
-			for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
+			ImGuiListClipper clipper;
+			clipper.Begin(32768 / 16);
+			while (clipper.Step())
 			{
-				uint16_t address = row * 16;
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::Text("$%04X", (0x8000 + address));
-				for (uint16_t cell = address; cell < address + 16; cell++)
+				for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
 				{
+					uint16_t address = row * 16;
+					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
-					if (cell + 0x8000 == machine.cpu.pc)
+					ImGui::Text("$%04X", (0x8000 + address));
+					for (uint16_t cell = address; cell < address + 16; cell++)
 					{
-						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+						ImGui::TableNextColumn();
+						if (cell + 0x8000 == machine.cpu.pc)
+						{
+							ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+						}
+						ImGui::Text("%02X", machine.cpu.memory_controller.Read8(0x8000 + cell));
+						if (cell + 0x8000 == machine.cpu.pc)
+						{
+							ImGui::PopStyleColor();
+						}
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip("$%04X", (0x8000 + cell));
 					}
-					ImGui::Text("%02X", machine.cpu.memory_controller.Read8(0x8000 + cell));
-					if (cell + 0x8000 == machine.cpu.pc)
-					{
-						ImGui::PopStyleColor();
-					}
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("$%04X", (0x8000 + cell));
 				}
 			}
+			ImGui::EndTable();
 		}
-		ImGui::EndTable();
 
 		ImGui::End();
 	}
@@ -102,40 +104,42 @@ void RomDebugger::Tick(DummyMachine& machine)
 
 		ImGui::Begin("Debugger");
 
-		ImGui::BeginTable("", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoKeepColumnsVisible);
-		ImGuiListClipper clipper;
-		clipper.Begin(static_cast<int>(disassembly.size()));
-		while (clipper.Step())
+		if (ImGui::BeginTable("Debugger table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoKeepColumnsVisible))
 		{
-			for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
+			ImGuiListClipper clipper;
+			clipper.Begin(static_cast<int>(disassembly.size()));
+			while (clipper.Step())
 			{
-				ImGui::TableNextRow();
-				if (disassembly[row].first == machine.cpu.pc)
+				for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
 				{
-					ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-				}
-				ImGui::TableNextColumn();
-				ImGui::Text("$%04X", disassembly[row].first);
-				ImGui::TableNextColumn();
-				uint16_t end = 0xFFFF;
-				if (row < disassembly.size() - 1)
-				{
-					end = disassembly[row + 1].first;
-				}
-				for (uint16_t cell = disassembly[row].first; cell < end; cell++)
-				{
-					ImGui::Text("$%02X", memory_controller.Read8(cell));
-					ImGui::SameLine();
-				}
-				ImGui::TableNextColumn();
-				ImGui::Text(disassembly[row].second.c_str());
-				if (disassembly[row].first == machine.cpu.pc)
-				{
-					ImGui::PopStyleColor();
+					ImGui::TableNextRow();
+					if (disassembly[row].first == machine.cpu.pc)
+					{
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+					}
+					ImGui::TableNextColumn();
+					ImGui::Text("$%04X", disassembly[row].first);
+					ImGui::TableNextColumn();
+					uint16_t end = 0xFFFF;
+					if (row < disassembly.size() - 1)
+					{
+						end = disassembly[row + 1].first;
+					}
+					for (uint16_t cell = disassembly[row].first; cell < end; cell++)
+					{
+						ImGui::Text("$%02X", memory_controller.Read8(cell));
+						ImGui::SameLine();
+					}
+					ImGui::TableNextColumn();
+					ImGui::Text(disassembly[row].second.c_str());
+					if (disassembly[row].first == machine.cpu.pc)
+					{
+						ImGui::PopStyleColor();
+					}
 				}
 			}
+			ImGui::EndTable();
 		}
-		ImGui::EndTable();
 
 		ImGui::End();
 	}

@@ -24,21 +24,23 @@ void RamEditor::Tick(DummyMachine& machine)
 			uint8_t value = 0;
 			int nibble0 = std::toupper(hex_buf[1]);
 			int nibble1 = std::toupper(hex_buf[0]);
+
 			if (nibble0 >= '0' && nibble0 <= '9')
 			{
 				value = nibble0 - '0';
 			}
 			else if (nibble0 >= 'A' && nibble0 <= 'F')
 			{
-				value = nibble0 - 'A';
+				value = 10 + (nibble0 - 'A');
 			}
+
 			if (nibble1 >= '0' && nibble1 <= '9')
 			{
 				value |= (nibble1 - '0') << 4;
 			}
 			else if (nibble1 >= 'A' && nibble1 <= 'F')
 			{
-				value |= (nibble1 - 'A') << 4;
+				value |= (10 + (nibble1 - 'A')) << 4;
 			}
 
 			machine.cpu.memory_controller.Write8(ram_editor_address, value);

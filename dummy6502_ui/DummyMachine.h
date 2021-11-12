@@ -2,6 +2,7 @@
 
 #include "../dummy6502/Cpu.h"
 #include "ITool.h"
+#include <set>
 
 class DummyMachine
 {
@@ -15,4 +16,5 @@ public:
 	dummy6502::Cpu cpu;
 
 	std::vector<std::shared_ptr<ITool>> tools;
+	std::set<uint16_t> breakpoints;
 };

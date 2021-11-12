@@ -73,6 +73,8 @@ int main(int argc, char** argv)
 	bool done = false;
 	bool cpu_running = false;
 	bool nmi_on_vsync = false;
+	bool open_pc_editor = false;
+	char hex_buf[5] = {};
 
 	int32_t hz = 1000000;
 
@@ -110,6 +112,69 @@ int main(int argc, char** argv)
 		ImGui_ImplSDLRenderer_NewFrame();
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
+
+		if (open_pc_editor)
+		{
+			ImGui::OpenPopup("Set PC");
+		}
+
+		if (ImGui::BeginPopupModal("Set PC", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("from $%04X to:", machine.cpu.pc);
+			ImGui::SameLine();
+			ImGui::InputText("", hex_buf, 5);
+			ImGui::SameLine();
+			if (ImGui::Button("Ok"))
+			{
+				uint16_t value = 0;
+				int nibble0 = std::toupper(hex_buf[3]);
+				int nibble1 = std::toupper(hex_buf[2]);
+				int nibble2 = std::toupper(hex_buf[1]);
+				int nibble3 = std::toupper(hex_buf[0]);
+
+				if (nibble0 >= '0' && nibble0 <= '9')
+				{
+					value = nibble0 - '0';
+				}
+				else if (nibble0 >= 'A' && nibble0 <= 'F')
+				{
+					value = 10 + (nibble0 - 'A');
+				}
+
+				if (nibble1 >= '0' && nibble1 <= '9')
+				{
+					value |= (nibble1 - '0') << 4;
+				}
+				else if (nibble1 >= 'A' && nibble1 <= 'F')
+				{
+					value |= (10 + (nibble1 - 'A')) << 4;
+				}
+
+				if (nibble2 >= '0' && nibble2 <= '9')
+				{
+					value |= (nibble2 - '0') << 8;
+				}
+				else if (nibble2 >= 'A' && nibble2 <= 'F')
+				{
+					value |= (10 + (nibble2 - 'A')) << 8;
+				}
+
+				if (nibble3 >= '0' && nibble3 <= '9')
+				{
+					value |= (nibble3 - '0') << 12;
+				}
+				else if (nibble3 >= 'A' && nibble3 <= 'F')
+				{
+					value |= (10 + (nibble3 - 'A')) << 12;
+				}
+
+				machine.cpu.pc = value;
+
+				ImGui::CloseCurrentPopup();
+				open_pc_editor = false;
+			}
+			ImGui::EndPopup();
+		}
 
 		{
 
@@ -150,6 +215,15 @@ int main(int argc, char** argv)
 				}
 			}
 
+			if (!machine.breakpoints.empty())
+			{
+				ImGui::SameLine();
+				if (ImGui::Button("Clear Breakpoints"))
+				{
+					machine.breakpoints.clear();
+				}
+			}
+
 			bool step_pressed = ImGui::Button("Step");
 			if (step_pressed)
 			{
@@ -167,6 +241,14 @@ int main(int argc, char** argv)
 						machine.cpu.Step();
 						uint64_t after_ticks = machine.cpu.ticks;
 						current_frame_ticks -= static_cast<int32_t>(after_ticks - before_ticks);
+						if (!machine.breakpoints.empty())
+						{
+							if (machine.breakpoints.contains(machine.cpu.pc))
+							{
+								cpu_running = false;
+								break;
+							}
+						}
 					}
 					catch (const std::exception& e)
 					{
@@ -178,6 +260,10 @@ int main(int argc, char** argv)
 			}
 			ImGui::SameLine();
 			ImGui::Text("PC=$%04X Ticks: %llu", machine.cpu.pc, machine.cpu.ticks);
+			if (ImGui::IsItemClicked())
+			{
+				open_pc_editor = true;
+			}
 
 			std::string flags = "";
 			flags += machine.cpu.GetNegative() ? "N" : "-";

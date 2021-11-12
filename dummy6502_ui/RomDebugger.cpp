@@ -77,6 +77,7 @@ void RomDebugger::Tick(DummyMachine& machine)
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
 					ImGui::Text("$%04X", (0x8000 + address));
+
 					for (uint16_t cell = address; cell < address + 16; cell++)
 					{
 						ImGui::TableNextColumn();
@@ -104,6 +105,27 @@ void RomDebugger::Tick(DummyMachine& machine)
 
 		ImGui::Begin("Debugger");
 
+		bool seek_to_pc = false;
+
+		if (ImGui::Button("Seek to PC"))
+		{
+			seek_to_pc = true;
+		}
+
+		ImGui::BeginChild("Opcodes");
+
+		if (seek_to_pc)
+		{
+			for (size_t row = 0; row < disassembly.size(); row++)
+			{
+				if (disassembly[row].first >= machine.cpu.pc)
+				{
+					ImGui::SetScrollY(row * (ImGui::GetTextLineHeight() + 4));
+					break;
+				}
+			}
+		}
+
 		if (ImGui::BeginTable("Debugger table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoKeepColumnsVisible))
 		{
 			ImGuiListClipper clipper;
@@ -118,7 +140,28 @@ void RomDebugger::Tick(DummyMachine& machine)
 						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 					}
 					ImGui::TableNextColumn();
+					bool is_breakpoint = false;
+					if (machine.breakpoints.contains(disassembly[row].first))
+					{
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 255, 255));
+						is_breakpoint = true;
+					}
 					ImGui::Text("$%04X", disassembly[row].first);
+					if (is_breakpoint)
+					{
+						ImGui::PopStyleColor();
+					}
+					if (ImGui::IsItemClicked())
+					{
+						if (machine.breakpoints.contains(disassembly[row].first))
+						{
+							machine.breakpoints.erase(disassembly[row].first);
+						}
+						else
+						{
+							machine.breakpoints.insert(disassembly[row].first);
+						}
+					}
 					ImGui::TableNextColumn();
 					uint16_t end = 0xFFFF;
 					if (row < disassembly.size() - 1)
@@ -140,6 +183,8 @@ void RomDebugger::Tick(DummyMachine& machine)
 			}
 			ImGui::EndTable();
 		}
+
+		ImGui::EndChild();
 
 		ImGui::End();
 	}

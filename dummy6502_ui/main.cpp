@@ -313,8 +313,7 @@ int main(int argc, char** argv)
 			if (ImGui::BeginTable("", 2, ImGuiTableFlags_Borders))
 			{
 				uint8_t stack_base = machine.cpu.s;
-				stack_base++;
-				for (uint16_t address = (0x0100 + stack_base); address < 0x0200; address++)
+				for (uint16_t address = 0x01FF; address > (0x0100 | stack_base); address--)
 				{
 
 					ImGui::TableNextRow();

@@ -159,7 +159,7 @@
     <ClCompile Include="opcodes_lda_test.cpp" />
     <ClCompile Include="opcodes_regs_test.cpp" />
     <ClCompile Include="opcodes_sbc_test.cpp" />
-    <ClCompile Include="opcodes_stack_test_.cpp" />
+    <ClCompile Include="opcodes_stack_test.cpp" />
     <ClCompile Include="opcodes_sta_test.cpp" />
   </ItemGroup>
   <ItemGroup>

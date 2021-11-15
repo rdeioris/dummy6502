@@ -42,7 +42,7 @@
     <ClCompile Include="opcodes_jmp_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="opcodes_stack_test_.cpp">
+    <ClCompile Include="opcodes_stack_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="opcodes_jsr_test.cpp">

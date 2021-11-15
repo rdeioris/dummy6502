@@ -141,7 +141,7 @@ void RomDebugger::Tick(DummyMachine& machine)
 					}
 					ImGui::TableNextColumn();
 					bool is_breakpoint = false;
-					if (machine.breakpoints.contains(disassembly[row].first))
+					if (machine.breakpoints.find(disassembly[row].first) != machine.breakpoints.end())
 					{
 						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 255, 255));
 						is_breakpoint = true;
@@ -153,7 +153,7 @@ void RomDebugger::Tick(DummyMachine& machine)
 					}
 					if (ImGui::IsItemClicked())
 					{
-						if (machine.breakpoints.contains(disassembly[row].first))
+						if (machine.breakpoints.find(disassembly[row].first) != machine.breakpoints.end())
 						{
 							machine.breakpoints.erase(disassembly[row].first);
 						}
@@ -174,7 +174,7 @@ void RomDebugger::Tick(DummyMachine& machine)
 						ImGui::SameLine();
 					}
 					ImGui::TableNextColumn();
-					ImGui::Text(disassembly[row].second.c_str());
+					ImGui::Text("%s", disassembly[row].second.c_str());
 					if (disassembly[row].first == machine.cpu.pc)
 					{
 						ImGui::PopStyleColor();

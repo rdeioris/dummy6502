@@ -8,6 +8,7 @@ namespace dummy6502
 	public:
 		Ram() = delete;
 		Ram(const uint16_t size);
+		virtual ~Ram() = default;
 		uint8_t Read8(const uint16_t address);
 		uint16_t Read16(const uint16_t address);
 		void Write8(const uint16_t address, const uint8_t value);

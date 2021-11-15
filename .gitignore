@@ -391,4 +391,6 @@ FodyWeavers.xsd
 *.a
 
 dummy6502_tests/dummy6502_tests
+dummy6502_ui/dummy6502_ui
 .DS_Store
+dummy6502_ui/libSDL2-2.0.dylib

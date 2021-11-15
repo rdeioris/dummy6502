@@ -6,6 +6,8 @@
 class DummyJoypad : public dummy6502::IMemoryMappable, public ITool
 {
 public:
+	virtual ~DummyJoypad() = default;
+
 	void SetBit(const uint8_t bit)
 	{
 		mask |= 1 << bit;
@@ -16,21 +18,21 @@ public:
 		mask &= ~(1 << bit);
 	}
 
-	uint8_t Read8(const uint16_t address)
+	uint8_t Read8(const uint16_t address) override
 	{
 		return mask;
 	}
 
-	uint16_t Read16(const uint16_t address)
+	uint16_t Read16(const uint16_t address) override
 	{
 		return mask;
 	}
 
-	void Write8(const uint16_t address, const uint8_t value)
+	void Write8(const uint16_t address, const uint8_t value) override
 	{
 	}
 
-	void Write16(const uint16_t address, const uint16_t value)
+	void Write16(const uint16_t address, const uint16_t value) override
 	{
 	}
 

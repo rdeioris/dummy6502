@@ -60,7 +60,7 @@ void RamEditor::Tick(DummyMachine& machine)
 			uint16_t page_base = page * 256;
 			std::string table_name = "Page $0" + std::to_string(page);
 			ImGui::AlignTextToFramePadding();
-			ImGui::Text(table_name.c_str());
+			ImGui::Text("%s", table_name.c_str());
 			ImGui::SameLine();
 			if (ImGui::Button(("Clear Page###clear_" + table_name).c_str()))
 			{

@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 	if (renderer == NULL)
 	{
 		SDL_Log("Error creating SDL_Renderer!");
-		return false;
+		return -1;
 	}
 
 	// Setup Dear ImGui context
@@ -243,7 +243,7 @@ int main(int argc, char** argv)
 						current_frame_ticks -= static_cast<int32_t>(after_ticks - before_ticks);
 						if (!machine.breakpoints.empty())
 						{
-							if (machine.breakpoints.contains(machine.cpu.pc))
+							if (machine.breakpoints.find(machine.cpu.pc) != machine.breakpoints.end())
 							{
 								cpu_running = false;
 								break;
@@ -294,7 +294,7 @@ int main(int argc, char** argv)
 
 		if (ImGui::BeginPopupModal("CPU Exception", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 		{
-			ImGui::Text(cpu_exception_message.c_str());
+			ImGui::Text("%s", cpu_exception_message.c_str());
 			ImGui::SameLine();
 			if (ImGui::Button("Ok"))
 			{

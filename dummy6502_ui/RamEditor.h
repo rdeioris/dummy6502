@@ -5,6 +5,7 @@
 class RamEditor : public ITool
 {
 public:
+	virtual ~RamEditor() = default;
 	virtual void Init(class DummyMachine& machine, SDL_Window* window, SDL_Renderer* renderer) override;
 	virtual void Tick(class DummyMachine& machine) override;
 protected:

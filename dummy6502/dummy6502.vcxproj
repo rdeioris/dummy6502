@@ -145,7 +145,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Cpu.cpp" />
-    <ClCompile Include="MemoryController.cpp" />
     <ClCompile Include="Ram.cpp" />
     <ClCompile Include="Rom.cpp" />
   </ItemGroup>

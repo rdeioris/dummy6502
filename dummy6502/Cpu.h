@@ -1,10 +1,20 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#ifdef _WIN32
 #include <format>
+#else
+#include <fmt/format.h>
+#endif
 #include <functional>
 #include <sstream>
 #include "MemoryController.h"
+
+#ifdef _WIN32
+using std::format;
+#else
+using fmt::format;
+#endif
 
 namespace dummy6502
 {

@@ -386,3 +386,9 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+*.o
+*.a
+
+dummy6502_tests/dummy6502_tests
+.DS_Store

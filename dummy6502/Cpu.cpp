@@ -208,7 +208,7 @@ uint16_t dummy6502::Cpu::Accumulator()
 uint16_t dummy6502::Cpu::Immediate()
 {
 	opcode_value = Read8FromPc();
-	addressing_mode_disassembly = std::format("#${:02X}", opcode_value);
+	addressing_mode_disassembly = format("#${:02X}", opcode_value);
 	ticks++;
 	return 1;
 }
@@ -216,7 +216,7 @@ uint16_t dummy6502::Cpu::Immediate()
 uint16_t dummy6502::Cpu::ZeroPage()
 {
 	opcode_address = Read8FromPc();
-	addressing_mode_disassembly = std::format("${:02X}", opcode_address);
+	addressing_mode_disassembly = format("${:02X}", opcode_address);
 	ticks++;
 	opcode_value = memory_controller.Read8(opcode_address);
 	ticks++;
@@ -226,7 +226,7 @@ uint16_t dummy6502::Cpu::ZeroPage()
 uint16_t dummy6502::Cpu::ZeroPageX()
 {
 	uint8_t zero_page_address = Read8FromPc();
-	addressing_mode_disassembly = std::format("${:02X}, X", zero_page_address);
+	addressing_mode_disassembly = format("${:02X}, X", zero_page_address);
 	ticks++;
 	zero_page_address += x;
 	ticks++;
@@ -239,7 +239,7 @@ uint16_t dummy6502::Cpu::ZeroPageX()
 uint16_t dummy6502::Cpu::ZeroPageY()
 {
 	uint8_t zero_page_address = Read8FromPc();
-	addressing_mode_disassembly = std::format("${:02X}, Y", zero_page_address);
+	addressing_mode_disassembly = format("${:02X}, Y", zero_page_address);
 	ticks++;
 	zero_page_address += y;
 	ticks++;
@@ -252,7 +252,7 @@ uint16_t dummy6502::Cpu::ZeroPageY()
 uint16_t dummy6502::Cpu::IndirectX()
 {
 	uint8_t zero_page_address = Read8FromPc();
-	addressing_mode_disassembly = std::format("(${:02X}, X)", zero_page_address);
+	addressing_mode_disassembly = format("(${:02X}, X)", zero_page_address);
 	ticks++;
 	zero_page_address += x;
 	ticks++;
@@ -267,7 +267,7 @@ uint16_t dummy6502::Cpu::IndirectX()
 uint16_t dummy6502::Cpu::IndirectY()
 {
 	uint8_t zero_page_address = Read8FromPc();
-	addressing_mode_disassembly = std::format("(${:02X}), Y", zero_page_address);
+	addressing_mode_disassembly = format("(${:02X}), Y", zero_page_address);
 	ticks++;
 	uint16_t indirect_address = memory_controller.Read16(zero_page_address);
 	ticks += 2;
@@ -286,7 +286,7 @@ uint16_t dummy6502::Cpu::IndirectY()
 uint16_t dummy6502::Cpu::Indirect()
 {
 	uint16_t indirect_address = Read16FromPc();
-	addressing_mode_disassembly = std::format("(${:04X})", indirect_address);
+	addressing_mode_disassembly = format("(${:04X})", indirect_address);
 	ticks += 2;
 	// special case (well, bug) for cross boundary indirect jump
 	if ((indirect_address & 0x00FF) == 0xFF)
@@ -346,7 +346,7 @@ uint16_t dummy6502::Cpu::IndirectYAlwaysCross()
 uint16_t dummy6502::Cpu::AbsoluteAddressX()
 {
 	opcode_address = Read16FromPc();
-	addressing_mode_disassembly = std::format("${:04X}, X", opcode_address);
+	addressing_mode_disassembly = format("${:04X}, X", opcode_address);
 	ticks += 2;
 	uint16_t page = opcode_address & 0xFF00;
 	opcode_address += x;
@@ -368,7 +368,7 @@ uint16_t dummy6502::Cpu::AbsoluteValueY()
 uint16_t dummy6502::Cpu::AbsoluteAddressY()
 {
 	opcode_address = Read16FromPc();
-	addressing_mode_disassembly = std::format("${:04X}, Y", opcode_address);
+	addressing_mode_disassembly = format("${:04X}, Y", opcode_address);
 	ticks += 2;
 	uint16_t page = opcode_address & 0xFF00;
 	opcode_address += y;
@@ -382,7 +382,7 @@ uint16_t dummy6502::Cpu::AbsoluteAddressY()
 uint16_t dummy6502::Cpu::AbsoluteAddress()
 {
 	opcode_address = Read16FromPc();
-	addressing_mode_disassembly = std::format("${:04X}", opcode_address);
+	addressing_mode_disassembly = format("${:04X}", opcode_address);
 	ticks += 2;
 	return 2;
 }
@@ -425,7 +425,7 @@ uint16_t dummy6502::Cpu::BranchAddress()
 	int8_t* signed_address = reinterpret_cast<int8_t*>(&unsigned_address);
 	opcode_address = static_cast<uint16_t>(static_cast<int32_t>(pc) + 1 + *signed_address);
 	ticks++;
-	addressing_mode_disassembly = std::format("${:04X}", opcode_address);
+	addressing_mode_disassembly = format("${:04X}", opcode_address);
 	return 1;
 }
 
@@ -484,7 +484,7 @@ std::string dummy6502::Cpu::GetDisassembly(uint16_t& address)
 	address++;
 	address += opcodes[opcode].addressing_mode(this);
 	pc = tmp_pc;
-	return std::format("{} {}", opcodes[opcode].opcode_name, addressing_mode_disassembly);
+	return format("{} {}", opcodes[opcode].opcode_name, addressing_mode_disassembly);
 }
 
 void dummy6502::Cpu::Nmi()
@@ -830,7 +830,7 @@ void dummy6502::Cpu::BEQ()
 		ticks++;
 		uint16_t nextop_page = (pc + 1) & 0xFF00;
 		uint16_t branch_page = opcode_address & 0xFF00;
-		if (nextop_page != (opcode_address & 0xFF00))
+		if (nextop_page != branch_page)
 		{
 			ticks++;
 		}
@@ -845,7 +845,7 @@ void dummy6502::Cpu::BNE()
 		ticks++;
 		uint16_t nextop_page = (pc + 1) & 0xFF00;
 		uint16_t branch_page = opcode_address & 0xFF00;
-		if (nextop_page != (opcode_address & 0xFF00))
+		if (nextop_page != branch_page)
 		{
 			ticks++;
 		}
@@ -860,7 +860,7 @@ void dummy6502::Cpu::BMI()
 		ticks++;
 		uint16_t nextop_page = (pc + 1) & 0xFF00;
 		uint16_t branch_page = opcode_address & 0xFF00;
-		if (nextop_page != (opcode_address & 0xFF00))
+		if (nextop_page != branch_page)
 		{
 			ticks++;
 		}
@@ -875,7 +875,7 @@ void dummy6502::Cpu::BPL()
 		ticks++;
 		uint16_t nextop_page = (pc + 1) & 0xFF00;
 		uint16_t branch_page = opcode_address & 0xFF00;
-		if (nextop_page != (opcode_address & 0xFF00))
+		if (nextop_page != branch_page)
 		{
 			ticks++;
 		}
@@ -890,7 +890,7 @@ void dummy6502::Cpu::BCS()
 		ticks++;
 		uint16_t nextop_page = (pc + 1) & 0xFF00;
 		uint16_t branch_page = opcode_address & 0xFF00;
-		if (nextop_page != (opcode_address & 0xFF00))
+		if (nextop_page != branch_page)
 		{
 			ticks++;
 		}
@@ -905,7 +905,7 @@ void dummy6502::Cpu::BCC()
 		ticks++;
 		uint16_t nextop_page = (pc + 1) & 0xFF00;
 		uint16_t branch_page = opcode_address & 0xFF00;
-		if (nextop_page != (opcode_address & 0xFF00))
+		if (nextop_page != branch_page)
 		{
 			ticks++;
 		}
@@ -920,7 +920,7 @@ void dummy6502::Cpu::BVS()
 		ticks++;
 		uint16_t nextop_page = (pc + 1) & 0xFF00;
 		uint16_t branch_page = opcode_address & 0xFF00;
-		if (nextop_page != (opcode_address & 0xFF00))
+		if (nextop_page != branch_page)
 		{
 			ticks++;
 		}
@@ -935,7 +935,7 @@ void dummy6502::Cpu::BVC()
 		ticks++;
 		uint16_t nextop_page = (pc + 1) & 0xFF00;
 		uint16_t branch_page = opcode_address & 0xFF00;
-		if (nextop_page != (opcode_address & 0xFF00))
+		if (nextop_page != branch_page)
 		{
 			ticks++;
 		}

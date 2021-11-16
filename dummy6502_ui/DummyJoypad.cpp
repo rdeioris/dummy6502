@@ -28,6 +28,14 @@ void DummyJoypad::Event(DummyMachine& machine, SDL_Event& event)
 		{
 			SetBit(3);
 		}
+		else if (event.key.keysym.sym == SDLK_RETURN)
+		{
+			SetBit(4);
+		}
+		else if (event.key.keysym.sym == SDLK_SPACE)
+		{
+			SetBit(5);
+		}
 	}
 	if (event.type == SDL_KEYUP)
 	{
@@ -46,6 +54,14 @@ void DummyJoypad::Event(DummyMachine& machine, SDL_Event& event)
 		else if (event.key.keysym.sym == SDLK_RIGHT)
 		{
 			ClearBit(3);
+		}
+		else if (event.key.keysym.sym == SDLK_RETURN)
+		{
+			ClearBit(4);
+		}
+		else if (event.key.keysym.sym == SDLK_SPACE)
+		{
+			ClearBit(5);
 		}
 	}
 }

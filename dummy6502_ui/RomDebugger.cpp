@@ -8,8 +8,15 @@ void RomDebugger::Init(DummyMachine& machine, SDL_Window* window, SDL_Renderer* 
 	while (disassembly_base <= 0xFFF7)
 	{
 		uint16_t current_line = disassembly_base;
-		std::string line = machine.cpu.GetDisassembly(disassembly_base);
-		disassembly.push_back({ current_line, line });
+		try
+		{
+			std::string line = machine.cpu.GetDisassembly(disassembly_base);
+			disassembly.push_back({ current_line, line });
+		}
+		catch (std::exception e)
+		{
+			disassembly.push_back({ current_line, "???"});
+		}
 	}
 
 	file_dialog.SetTitle("Select ROM");
@@ -28,8 +35,15 @@ void RomDebugger::LoadRom(DummyMachine& machine)
 	while (disassembly_base <= 0xFFF7)
 	{
 		uint16_t current_line = disassembly_base;
-		std::string line = machine.cpu.GetDisassembly(disassembly_base);
-		disassembly.push_back({ current_line, line });
+		try
+		{
+			std::string line = machine.cpu.GetDisassembly(disassembly_base);
+			disassembly.push_back({ current_line, line });
+		}
+		catch (std::exception e)
+		{
+			disassembly.push_back({ current_line, "???" });
+		}
 	}
 
 }

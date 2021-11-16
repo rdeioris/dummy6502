@@ -313,9 +313,9 @@ int main(int argc, char** argv)
 			if (ImGui::BeginTable("", 2, ImGuiTableFlags_Borders))
 			{
 				uint8_t stack_base = machine.cpu.s;
-				for (uint16_t address = 0x01FF; address > (0x0100 | stack_base); address--)
+				std::vector<uint16_t> stack;
+				for (uint16_t address = (0x0100 | stack_base) + 1; address <= 0x01FF; address++)
 				{
-
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
 					ImGui::Text("$%02X", address - 0x0100);

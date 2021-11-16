@@ -177,7 +177,7 @@ void RomDebugger::Tick(DummyMachine& machine)
 						}
 					}
 					ImGui::TableNextColumn();
-					uint16_t end = 0xFFFF;
+					uint16_t end = 0xFFF8;
 					if (row < disassembly.size() - 1)
 					{
 						end = disassembly[row + 1].first;

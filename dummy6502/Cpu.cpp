@@ -34,8 +34,8 @@ dummy6502::Cpu::Cpu(IMemoryController& in_memory_controller)
 	OPCODE(0x0E, AbsoluteValue, ASL);
 	OPCODE(0x1E, AbsoluteValueX, ASL);
 
-	OPCODE(0x0A, ZeroPage, BIT);
-	OPCODE(0x06, AbsoluteValue, BIT);
+	OPCODE(0x24, ZeroPage, BIT);
+	OPCODE(0x2C, AbsoluteValue, BIT);
 
 	OPCODE(0x10, BranchAddress, BPL);
 	OPCODE(0x30, BranchAddress, BMI);

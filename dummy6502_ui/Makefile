@@ -30,7 +30,8 @@ imgui_impl_sdlrenderer2.o: ../imgui/backends/imgui_impl_sdlrenderer2.cpp
 
 dummy6502_ui: $(OBJS) imgui.o imgui_tables.o imgui_widgets.o imgui_draw.o imgui_impl_sdlrenderer2.o imgui_impl_sdl2.o
 	$(CC) $(CFLAGS) -o $@ *.o ../dummy6502/libdummy6502.a ../fmt/libfmt.a -lstdc++ -L../SDL/build/.libs -lSDL2-2.0.0
-	#install_name_tool -change @rpath/libSDL2-2.0.dylib @executable_path/libSDL2-2.0.dylib dummy6502_ui
+	install_name_tool -change /tmp/lib/libSDL2-2.0.0.dylib @executable_path/libSDL2-2.0.0.dylib dummy6502_ui
+	install_name_tool -change /usr/local/lib/libSDL2-2.0.0.dylib @executable_path/libSDL2-2.0.0.dylib dummy6502_ui
 
 clean:
 	rm dummy6502_ui *.o

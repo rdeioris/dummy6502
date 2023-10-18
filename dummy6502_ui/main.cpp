@@ -1,8 +1,8 @@
 #include "SDL.h"
 #include "imgui.h"
 #include "imfilebrowser.h"
-#include "backends/imgui_impl_sdl.h"
-#include "backends/imgui_impl_sdlrenderer.h"
+#include "backends/imgui_impl_sdl2.h"
+#include "backends/imgui_impl_sdlrenderer2.h"
 #include "DummyMachine.h"
 #include "../dummy6502/Rom.h"
 #include "../dummy6502/Ram.h"
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 	machine.tools.push_back(joypad0);
 	machine.tools.push_back(std::make_shared<RomDebugger>(memory_controller));
 
-	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	SDL_Window* window = SDL_CreateWindow("Dummy6502", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1344, 756, window_flags);
 
 	// Setup SDL_Renderer instance
@@ -64,8 +64,8 @@ int main(int argc, char** argv)
 	ImGui::StyleColorsDark();
 
 	// setup renderers
-	ImGui_ImplSDL2_InitForSDLRenderer(window);
-	ImGui_ImplSDLRenderer_Init(renderer);
+	ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+	ImGui_ImplSDLRenderer2_Init(renderer);
 
 	std::string cpu_exception_message;
 
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 		}
 
 		// Start the Dear ImGui frame
-		ImGui_ImplSDLRenderer_NewFrame();
+		ImGui_ImplSDLRenderer2_NewFrame();
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
 
@@ -338,7 +338,7 @@ int main(int argc, char** argv)
 		ImGui::Render();
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
-		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
 		SDL_RenderPresent(renderer);
 
 		if (cpu_running && nmi_on_vsync)
@@ -348,7 +348,7 @@ int main(int argc, char** argv)
 	}
 
 	// Cleanup
-	ImGui_ImplSDLRenderer_Shutdown();
+	ImGui_ImplSDLRenderer2_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
